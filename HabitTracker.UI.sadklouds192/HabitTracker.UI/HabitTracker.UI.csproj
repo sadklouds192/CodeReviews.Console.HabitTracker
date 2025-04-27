@@ -8,4 +8,8 @@
         <RootNamespace>HabitTracker.UI.sadklouds192</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Database\" />
+    </ItemGroup>
+
 </Project>
