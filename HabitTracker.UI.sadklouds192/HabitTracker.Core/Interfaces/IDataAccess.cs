@@ -10,5 +10,4 @@ public interface IDataAccess
     public bool InsertHabit(Habit habit);
     public bool UpdateHabit(Habit habit, int id);
     public bool DeleteHabit(int id);
-    
 }

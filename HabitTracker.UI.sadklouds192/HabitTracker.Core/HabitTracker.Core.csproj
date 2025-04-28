@@ -7,17 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Validation\" />
+        <Folder Include="Validation\"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+        <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
-        <HintPath>..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.abstractions\9.0.4\lib\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.Configuration.Abstractions">
+            <HintPath>..\..\..\..\..\.nuget\packages\microsoft.extensions.configuration.abstractions\9.0.4\lib\net9.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

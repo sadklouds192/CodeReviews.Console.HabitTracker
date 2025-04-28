@@ -1,16 +1,11 @@
 using System.Data.SQLite;
 using HabitTracker.Core.Interfaces;
 using HabitTracker.Core.Models;
-using Microsoft.Extensions.Configuration;
 
 namespace HabitTracker.Core.Services;
 
 public class SqliteDataService : IDataAccess
 {
-    public SqliteDataService()
-    {
-    }
-
     public void InitializeDb(string connectionString)
     {
         // Extract the file path from the connection string
@@ -18,16 +13,13 @@ public class SqliteDataService : IDataAccess
 
         // Ensure the folder exists
         var directory = Path.GetDirectoryName(databaseFilePath);
-        if (!Directory.Exists(directory))
-        {
-            Directory.CreateDirectory(directory!);
-        }
+        if (!Directory.Exists(directory)) Directory.CreateDirectory(directory!);
 
         using (var connection = new SQLiteConnection(connectionString))
         {
             connection.Open();
 
-            string createTableQuery = @"
+            var createTableQuery = @"
             CREATE TABLE IF NOT EXISTS Habits (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name TEXT NOT NULL,
