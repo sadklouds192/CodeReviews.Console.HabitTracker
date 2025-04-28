@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 var configuration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
 var serviceProvider = new ServiceCollection()
@@ -20,5 +20,7 @@ var serviceProvider = new ServiceCollection()
     .BuildServiceProvider();
 
 // See https://aka.ms/new-console-template for more information
+IDataAccess dataAccess = serviceProvider.GetService<IDataAccess>();
+dataAccess.InitializeDb();
+Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
 
-Console.WriteLine("Hello, World!");
