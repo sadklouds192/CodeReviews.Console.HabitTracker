@@ -21,6 +21,7 @@ var serviceProvider = new ServiceCollection()
 
 // See https://aka.ms/new-console-template for more information
 IDataAccess dataAccess = serviceProvider.GetService<IDataAccess>();
-dataAccess.InitializeDb();
+dataAccess.InitializeDb(configuration.GetConnectionString("DefaultConnection"));
+
 Console.WriteLine(configuration.GetConnectionString("DefaultConnection"));
 

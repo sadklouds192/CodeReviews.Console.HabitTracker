@@ -4,7 +4,7 @@ namespace HabitTracker.Core.Interfaces;
 
 public interface IDataAccess
 {
-    public void InitializeDb();
+    public void InitializeDb(string connectionString);
     public List<Habit> GetHabits();
     public Habit GetHabit(int id);
     public bool InsertHabit(Habit habit);

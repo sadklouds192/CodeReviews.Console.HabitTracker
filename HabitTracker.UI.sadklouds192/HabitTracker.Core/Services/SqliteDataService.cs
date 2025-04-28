@@ -7,17 +7,14 @@ namespace HabitTracker.Core.Services;
 
 public class SqliteDataService : IDataAccess
 {
-    private readonly string _connectionString;
-    
-
-    public SqliteDataService(IConfiguration configuration)
+    public SqliteDataService()
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
-    public void InitializeDb()
+
+    public void InitializeDb(string connectionString)
     {
         // Extract the file path from the connection string
-        var databaseFilePath = new SQLiteConnectionStringBuilder(_connectionString).DataSource;
+        var databaseFilePath = new SQLiteConnectionStringBuilder(connectionString).DataSource;
 
         // Ensure the folder exists
         var directory = Path.GetDirectoryName(databaseFilePath);
@@ -25,8 +22,8 @@ public class SqliteDataService : IDataAccess
         {
             Directory.CreateDirectory(directory!);
         }
-        
-        using (var connection = new SQLiteConnection(_connectionString))
+
+        using (var connection = new SQLiteConnection(connectionString))
         {
             connection.Open();
 
@@ -45,7 +42,6 @@ public class SqliteDataService : IDataAccess
         }
     }
 
-    
 
     public List<Habit> GetHabits()
     {
