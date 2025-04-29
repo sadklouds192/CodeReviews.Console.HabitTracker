@@ -35,27 +35,27 @@ public class SqliteDataService : IDataAccess
     }
 
 
-    public List<Habit> GetHabits()
+    public List<Habit> GetHabits(string connectionString)
     {
         throw new NotImplementedException();
     }
 
-    public Habit GetHabit(int id)
+    public Habit GetHabit(int id, string connectionString)
     {
         throw new NotImplementedException();
     }
 
-    public bool InsertHabit(Habit habit)
+    public bool InsertHabit(Habit habit, string connectionString)
     {
         throw new NotImplementedException();
     }
 
-    public bool UpdateHabit(Habit habit, int id)
+    public bool UpdateHabit(Habit habit, int id, string connectionString)
     {
         throw new NotImplementedException();
     }
 
-    public bool DeleteHabit(int id)
+    public bool DeleteHabit(int id, string connectionString)
     {
         throw new NotImplementedException();
     }
