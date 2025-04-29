@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using HabitTracker.Core.Interfaces;
+using HabitTracker.Core.Models;
 using Microsoft.Extensions.Configuration;
 
 namespace HabitTracker.UI.sadklouds192;
@@ -66,6 +67,27 @@ public class HabitApplication
         Console.WriteLine("Type '4' to update habit");
         Console.WriteLine("-----------------------------------\n");
         Console.Write("Enter your choice: ");
+    }
+
+    public void InsertHabit()
+    {
+        string habitName = UserInput.GetUserInput("Enter habit's name: ");
+        int habitQuantity = UserInput.GetIntInput("Enter habit's quantity: ");
+        DateTime habitDate = UserInput.GetUserDate("Enter habit's date: ");
+        try
+        {
+            Habit habit = new Habit()
+            {
+                Name = habitName,
+                Quantity = habitQuantity,
+                DateTracked = habitDate
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: Could not insert habit");
+            Console.WriteLine($"Details: {ex.Message}");
+        }
     }
     
 }
