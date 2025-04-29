@@ -48,6 +48,9 @@ public class HabitApplication
                     running = false;
                     Console.WriteLine("Closing...");
                     break;
+                case "1":
+                    InsertHabit();
+                    break;
                 default:
                     Console.WriteLine("Invalid input. Please try again.");
                     break;
