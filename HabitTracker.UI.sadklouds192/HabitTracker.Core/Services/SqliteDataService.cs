@@ -33,8 +33,9 @@ public class SqliteDataService : IDataAccess
             CREATE TABLE IF NOT EXISTS Habits (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name TEXT NOT NULL,
+                Unit TEXT NOT NULL,
                 Quantity INTEGER NOT NULL,
-                DateTracked TEXT NOT NULL
+                Date TEXT NOT NULL
             );";
 
                 using (var command = new SQLiteCommand(createTableQuery, connection))
@@ -68,14 +69,15 @@ public class SqliteDataService : IDataAccess
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                var query = @"INSERT INTO Habits (Name, Quantity, DateTracked)
-                              VALUES (@Name, @Quantity, @DateTracked)";
+                var query = @"INSERT INTO Habits (Name, Unit, Quantity, Date)
+                              VALUES (@Name, @Unit, @Quantity, @Date)";
 
                 using (var command = new SQLiteCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Name", habit.Name);
+                    command.Parameters.AddWithValue("@Unit", habit.Unit);
                     command.Parameters.AddWithValue("@Quantity", habit.Quantity);
-                    command.Parameters.AddWithValue("@DateTracked", habit.DateTracked.ToString("yyyy-MM-dd"));
+                    command.Parameters.AddWithValue("@Date", habit.Date.ToString("yyyy-MM-dd"));
                     command.ExecuteNonQuery();
                 }
                 _logger.LogInformation($"Inserted {habit.Name} successfully");

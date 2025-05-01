@@ -79,15 +79,17 @@ public class HabitApplication
     public void InsertHabit()
     {
         string habitName = UserInput.GetUserInput("Enter habit's name: ");
-        int habitQuantity = UserInput.GetIntInput("Enter habit's quantity: ");
+        string habitUnit = UserInput.GetUserInput("Enter habit's unit of measure: ");
+        int habitQuantity = UserInput.GetIntInput("Enter habit's quantity (no decimal numbers): ");
         DateTime habitDate = UserInput.GetUserDate("Enter habit's date: ");
         try
         {
             Habit habit = new Habit()
             {
                 Name = habitName,
+                Unit = habitUnit,
                 Quantity = habitQuantity,
-                DateTracked = habitDate
+                Date = habitDate
             };
             _dataAccess.InsertHabit(habit, _connectionString);
         }
