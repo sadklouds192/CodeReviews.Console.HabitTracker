@@ -1,13 +1,21 @@
 using System.Data.SQLite;
 using HabitTracker.Core.Interfaces;
 using HabitTracker.Core.Models;
+using Microsoft.Extensions.Logging;
 
 namespace HabitTracker.Core.Services;
 
 public class SqliteDataService : IDataAccess
 {
+    private readonly ILogger<SqliteDataService> _logger;
+
+    public SqliteDataService(ILogger<SqliteDataService> logger)
+    {
+        _logger = logger;
+    }
     public void InitializeDb(string connectionString)
     {
+        _logger.LogInformation("Initializing database");
         // Extract the file path from the connection string
         var databaseFilePath = new SQLiteConnectionStringBuilder(connectionString).DataSource;
 
@@ -15,11 +23,13 @@ public class SqliteDataService : IDataAccess
         var directory = Path.GetDirectoryName(databaseFilePath);
         if (!Directory.Exists(directory)) Directory.CreateDirectory(directory!);
 
-        using (var connection = new SQLiteConnection(connectionString))
+        try
         {
-            connection.Open();
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
 
-            var createTableQuery = @"
+                var createTableQuery = @"
             CREATE TABLE IF NOT EXISTS Habits (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 Name TEXT NOT NULL,
@@ -27,10 +37,16 @@ public class SqliteDataService : IDataAccess
                 DateTracked TEXT NOT NULL
             );";
 
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
+                using (var command = new SQLiteCommand(createTableQuery, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
             }
+        }
+        catch (SQLiteException ex)
+        {
+            _logger.LogError($"Error initializing database: {ex.Message}");
+            throw;
         }
     }
 
@@ -47,7 +63,18 @@ public class SqliteDataService : IDataAccess
 
     public bool InsertHabit(Habit habit, string connectionString)
     {
-        throw new NotImplementedException();
+        using (var connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+            var query = @"INSERT INTO Habits (Id, Name, Quantity, DateTracked)";
+
+            using (var command = new SQLiteCommand(query, connection))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            return true;
+        }
     }
 
     public bool UpdateHabit(Habit habit, int id, string connectionString)

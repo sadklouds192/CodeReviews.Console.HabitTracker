@@ -3,16 +3,19 @@ using System.Linq.Expressions;
 using HabitTracker.Core.Interfaces;
 using HabitTracker.Core.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace HabitTracker.UI.sadklouds192;
 
 public class HabitApplication
 {
+    private readonly ILogger<HabitApplication> _logger;
     private readonly IDataAccess _dataAccess;
     private readonly string? _connectionString;
 
-    public HabitApplication(IDataAccess dataAccess, IConfiguration configuration)
+    public HabitApplication(ILogger<HabitApplication> logger,IDataAccess dataAccess, IConfiguration configuration)
     {
+        _logger = logger;
         _dataAccess = dataAccess;
         _connectionString = configuration.GetConnectionString("DefaultConnection");
         
@@ -20,6 +23,7 @@ public class HabitApplication
 
     public void Run()
     {
+        _logger.LogInformation("Application started");
         if (string.IsNullOrEmpty(_connectionString))
         {
             Console.WriteLine("ERROR: Connection string is missing. Please check your configuration.");
