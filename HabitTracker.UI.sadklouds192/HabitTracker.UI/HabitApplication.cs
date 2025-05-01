@@ -68,8 +68,8 @@ public class HabitApplication
         Console.WriteLine("Main Menu\n");
         Console.WriteLine("What would you like to do?\n");
         Console.WriteLine("Type '0' to close the application");
-        Console.WriteLine("Type '1' to view all habits");
-        Console.WriteLine("Type '2' to insert habit");
+        Console.WriteLine("Type '1' to Insert habit");
+        Console.WriteLine("Type '2' to View all habits");
         Console.WriteLine("Type '3' to delete habit");
         Console.WriteLine("Type '4' to update habit");
         Console.WriteLine("-----------------------------------\n");
@@ -89,6 +89,7 @@ public class HabitApplication
                 Quantity = habitQuantity,
                 DateTracked = habitDate
             };
+            _dataAccess.InsertHabit(habit, _connectionString);
         }
         catch (Exception ex)
         {

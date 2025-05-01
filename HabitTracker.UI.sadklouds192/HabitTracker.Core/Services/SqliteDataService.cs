@@ -63,18 +63,31 @@ public class SqliteDataService : IDataAccess
 
     public bool InsertHabit(Habit habit, string connectionString)
     {
-        using (var connection = new SQLiteConnection(connectionString))
+        try
         {
-            connection.Open();
-            var query = @"INSERT INTO Habits (Id, Name, Quantity, DateTracked)";
-
-            using (var command = new SQLiteCommand(query, connection))
+            using (var connection = new SQLiteConnection(connectionString))
             {
-                command.ExecuteNonQuery();
-            }
+                connection.Open();
+                var query = @"INSERT INTO Habits (Name, Quantity, DateTracked)
+                              VALUES (@Name, @Quantity, @DateTracked)";
 
-            return true;
+                using (var command = new SQLiteCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", habit.Name);
+                    command.Parameters.AddWithValue("@Quantity", habit.Quantity);
+                    command.Parameters.AddWithValue("@DateTracked", habit.DateTracked.ToString("yyyy-MM-dd"));
+                    command.ExecuteNonQuery();
+                }
+                _logger.LogInformation($"Inserted {habit.Name} successfully");
+                return true;
+            }
         }
+        catch (SQLiteException ex)
+        {
+            _logger.LogError($"Error inserting habit: {ex.Message}");
+            return false;
+        }
+        
     }
 
     public bool UpdateHabit(Habit habit, int id, string connectionString)
