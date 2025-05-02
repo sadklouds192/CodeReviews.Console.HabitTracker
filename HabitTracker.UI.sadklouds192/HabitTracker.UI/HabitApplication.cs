@@ -58,6 +58,9 @@ public class HabitApplication
                 case "2":
                     GetHabits();
                     break;
+                case "3":
+                    DeleteHabit();
+                    break;
                 case "5":
                     GetHabit();
                     break;
@@ -98,6 +101,7 @@ public class HabitApplication
                 Date = habitDate
             };
             _dataAccess.InsertHabit(habit, _connectionString);
+            Console.WriteLine("Habit inserted successfully!");
         }
         catch (Exception ex)
         {
@@ -108,7 +112,7 @@ public class HabitApplication
 
     public void GetHabit()
     {
-        int userInput = UserInput.GetIntInput("Please enter habit Id:");
+        int userInput = UserInput.GetIntInput("Please enter habit Id: ");
         try
         {
             Habit habit = _dataAccess.GetHabit(userInput, _connectionString);
@@ -118,30 +122,74 @@ public class HabitApplication
                 return;
             }
 
-            Console.WriteLine($"Habit: {habit.Name}, Id: {habit.Id}, Unit: {habit.Unit}, " +
-                              $"Quantity: {habit.Quantity}, " +
-                              $"Date: {habit.Date}");
-            Console.WriteLine("\nPress any key to continue...");
-            Console.ReadKey();
+            Console.WriteLine($"\nHabit Details:\n" +
+                              $"Id: {habit.Id}\n" +
+                              $"Name: {habit.Name}\n" +
+                              $"Unit: {habit.Unit}\n" +
+                              $"Quantity: {habit.Quantity}\n" +
+                              $"Date: {habit.Date:yyyy-MM-dd}");
+           
 
         }
         catch (Exception ex)
         {
-            Console.WriteLine("ERROR: Could not get habit");
+            Console.WriteLine($"ERROR: Could not get habit {ex.Message}");
+        }
+        finally
+        {
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
         }
         
     }
 
+    public void DeleteHabit()
+    {
+        int userInput = UserInput.GetIntInput("Please enter habit Id: ");
+        try
+        {
+            Console.WriteLine("\nDeleting habit");
+            _dataAccess.DeleteHabit(userInput, _connectionString);
+            Console.WriteLine("Habit deleted.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: Could not delete habit: {ex.Message} ");
+        }
+        finally
+        {
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+    }
+
     public void GetHabits()
     {
-        habbits = _dataAccess.GetHabits(_connectionString);
-        if (!habbits.Any())
+        try
         {
-            Console.WriteLine("\nNo Habits found.");
-            return;
-        }
+            habbits = _dataAccess.GetHabits(_connectionString);
+            if (!habbits.Any())
+            {
+                Console.WriteLine("\nNo Habits found.");
+                return;
+            }
 
-        foreach (var habit in habbits)
-            Console.WriteLine($"Habit: {habit.Name}, Id: {habit.Id}, Date: {habit.Date:yyyy-MM-dd}");
+            foreach (var habit in habbits)
+                Console.WriteLine($"Habit: {habit.Name}, Id: {habit.Id}, Date: {habit.Date:yyyy-MM-dd}");
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: Could not get habits {ex.Message}");
+        }
+        finally
+        {
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
     }
 }

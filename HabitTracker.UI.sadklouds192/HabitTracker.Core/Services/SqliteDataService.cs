@@ -121,7 +121,7 @@ public class SqliteDataService : IDataAccess
         }
     }
 
-        public bool InsertHabit(Habit habit, string connectionString)
+        public void InsertHabit(Habit habit, string connectionString)
         {
             try
             {
@@ -141,23 +141,40 @@ public class SqliteDataService : IDataAccess
                     }
 
                     _logger.LogInformation($"Inserted {habit.Name} successfully");
-                    return true;
                 }
             }
             catch (SQLiteException ex)
             {
                 _logger.LogError($"Error inserting habit: {ex.Message}");
-                return false;
             }
         }
 
-        public bool UpdateHabit(Habit habit, int id, string connectionString)
+        public void UpdateHabit(Habit habit, int id, string connectionString)
         {
             throw new NotImplementedException();
         }
 
-        public bool DeleteHabit(int id, string connectionString)
+        public void DeleteHabit(int id, string connectionString)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    var query = @"DELETE FROM Habits WHERE Id = @Id;";
+                    using (var command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", id);
+                        int rowsEffected = command.ExecuteNonQuery();
+                        if (rowsEffected == 0)
+                            throw new InvalidOperationException($"Habit with id {id} does not exist");
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                _logger.LogError($"Error deleting habit: {ex.Message}");
+                throw;
+            }
         }
     }
