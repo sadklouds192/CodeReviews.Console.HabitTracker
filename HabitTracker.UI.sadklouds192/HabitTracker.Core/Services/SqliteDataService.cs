@@ -149,9 +149,34 @@ public class SqliteDataService : IDataAccess
             }
         }
 
-        public void UpdateHabit(Habit habit, int id, string connectionString)
+        //updated habit should possess original habit id
+        public void UpdateHabit(Habit habit,  string connectionString)
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    var habitUpdateCommand = @"UPDATE Habits SET Name = @Name, Unit = @Unit, Quantity = @Quantity, Date = @Date WHERE Id = @Id;";
+                    using (var command = new SQLiteCommand(habitUpdateCommand, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", habit.Id);
+                        command.Parameters.AddWithValue("@Name", habit.Name);
+                        command.Parameters.AddWithValue("@Unit", habit.Unit);
+                        command.Parameters.AddWithValue("@Quantity", habit.Quantity);
+                        command.Parameters.AddWithValue("@Date", habit.Date.ToString("yyyy-MM-dd"));
+                        int rowsEffected = command.ExecuteNonQuery();
+                        
+                        if (rowsEffected == 0)
+                            throw new InvalidOperationException($"Error: Habit with id {habit.Id} does not exist!");
+                    }
+                }
+            }
+            catch (SQLiteException ex)
+            {
+                _logger.LogError($"Error updating habit: {ex.Message}");
+                throw;
+            }
         }
 
         public void DeleteHabit(int id, string connectionString)

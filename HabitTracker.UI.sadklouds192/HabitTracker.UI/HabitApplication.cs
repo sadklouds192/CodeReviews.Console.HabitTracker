@@ -61,6 +61,9 @@ public class HabitApplication
                 case "3":
                     DeleteHabit();
                     break;
+                case "4":
+                    UpdateHabit();
+                    break;
                 case "5":
                     GetHabit();
                     break;
@@ -165,6 +168,42 @@ public class HabitApplication
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
+    }
+
+    public void UpdateHabit()
+    {
+        int habitId = UserInput.GetIntInput("Please enter habit Id: ");
+        try
+        {
+            Habit habit = _dataAccess.GetHabit(habitId, _connectionString);
+            if (habit == null)
+            {
+                Console.WriteLine("Habit not found!");
+                return;
+            }
+            
+            Habit updatedHabit = new()
+            {
+                Id = habit.Id,
+                Name = UserInput.GetOptionalUserInput("Enter habit's name: ", habit.Name),
+                Unit = UserInput.GetOptionalUserInput("Enter habit's unit: ", habit.Unit),
+                Quantity = UserInput.GetOptionalIntInput("Enter habit's quantity: ", habit.Quantity),
+                Date = UserInput.GetOptionalUserDate("Enter habit's date: ", habit.Date),
+            };
+
+            _dataAccess.UpdateHabit(updatedHabit, _connectionString);
+            Console.WriteLine("\nHabit updated successfully!.");
+
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"ERROR: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"ERROR: Could not update habit: {ex.Message}");
+        }
+        
     }
 
     public void GetHabits()
