@@ -32,5 +32,3 @@ var host = Host.CreateDefaultBuilder()
 
 var app = host.Services.GetRequiredService<HabitApplication>();
 app.Run();
-
-

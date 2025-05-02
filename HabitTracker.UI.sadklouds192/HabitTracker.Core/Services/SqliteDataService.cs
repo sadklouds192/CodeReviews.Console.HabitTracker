@@ -13,6 +13,7 @@ public class SqliteDataService : IDataAccess
     {
         _logger = logger;
     }
+
     public void InitializeDb(string connectionString)
     {
         _logger.LogInformation("Initializing database");
@@ -54,51 +55,109 @@ public class SqliteDataService : IDataAccess
 
     public List<Habit> GetHabits(string connectionString)
     {
-        throw new NotImplementedException();
+        try
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                var habits = new List<Habit>();
+                var getHabitsCommand = @"SELECT * FROM Habits;";
+
+                using (var command = new SQLiteCommand(getHabitsCommand, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                        habits.Add(new Habit
+                        {
+                            Id = Convert.ToInt32(reader["Id"]),
+                            Name = reader["Name"].ToString(),
+                            Unit = reader["Unit"].ToString(),
+                            Quantity = Convert.ToInt32(reader["Quantity"]),
+                            Date = Convert.ToDateTime(reader["Date"])
+                        });
+                }
+
+                return habits;
+            }
+        }
+        catch (SQLiteException ex)
+        {
+            _logger.LogError($"Error retrieving habits from database: {ex.Message}");
+            throw;
+        }
     }
 
     public Habit GetHabit(int id, string connectionString)
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool InsertHabit(Habit habit, string connectionString)
     {
         try
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                var query = @"INSERT INTO Habits (Name, Unit, Quantity, Date)
+                var getHabitCommand = @"SELECT * FROM Habits WHERE Id = @Id;";
+                using (var command = new SQLiteCommand(getHabitCommand, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                            return new Habit
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                Name = reader["Name"].ToString(),
+                                Unit = reader["Unit"].ToString(),
+                                Quantity = Convert.ToInt32(reader["Quantity"]),
+                                Date = Convert.ToDateTime(reader["Date"])
+                            };
+                    }
+                    return null;
+                }
+            }
+        }catch (SQLiteException ex)
+        {
+            _logger.LogError($"Error retrieving habit: {ex.Message}");
+            throw;
+        }
+    }
+
+        public bool InsertHabit(Habit habit, string connectionString)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    var query = @"INSERT INTO Habits (Name, Unit, Quantity, Date)
                               VALUES (@Name, @Unit, @Quantity, @Date)";
 
-                using (var command = new SQLiteCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Name", habit.Name);
-                    command.Parameters.AddWithValue("@Unit", habit.Unit);
-                    command.Parameters.AddWithValue("@Quantity", habit.Quantity);
-                    command.Parameters.AddWithValue("@Date", habit.Date.ToString("yyyy-MM-dd"));
-                    command.ExecuteNonQuery();
+                    using (var command = new SQLiteCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Name", habit.Name);
+                        command.Parameters.AddWithValue("@Unit", habit.Unit);
+                        command.Parameters.AddWithValue("@Quantity", habit.Quantity);
+                        command.Parameters.AddWithValue("@Date", habit.Date.ToString("yyyy-MM-dd"));
+                        command.ExecuteNonQuery();
+                    }
+
+                    _logger.LogInformation($"Inserted {habit.Name} successfully");
+                    return true;
                 }
-                _logger.LogInformation($"Inserted {habit.Name} successfully");
-                return true;
+            }
+            catch (SQLiteException ex)
+            {
+                _logger.LogError($"Error inserting habit: {ex.Message}");
+                return false;
             }
         }
-        catch (SQLiteException ex)
+
+        public bool UpdateHabit(Habit habit, int id, string connectionString)
         {
-            _logger.LogError($"Error inserting habit: {ex.Message}");
-            return false;
+            throw new NotImplementedException();
         }
-        
-    }
 
-    public bool UpdateHabit(Habit habit, int id, string connectionString)
-    {
-        throw new NotImplementedException();
+        public bool DeleteHabit(int id, string connectionString)
+        {
+            throw new NotImplementedException();
+        }
     }
-
-    public bool DeleteHabit(int id, string connectionString)
-    {
-        throw new NotImplementedException();
-    }
-}

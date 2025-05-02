@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-using System.Linq.Expressions;
 using HabitTracker.Core.Interfaces;
 using HabitTracker.Core.Models;
 using Microsoft.Extensions.Configuration;
@@ -9,17 +7,18 @@ namespace HabitTracker.UI.sadklouds192;
 
 public class HabitApplication
 {
-    private readonly ILogger<HabitApplication> _logger;
-    private readonly IDataAccess _dataAccess;
     private readonly string? _connectionString;
+    private readonly IDataAccess _dataAccess;
+    private readonly ILogger<HabitApplication> _logger;
 
-    public HabitApplication(ILogger<HabitApplication> logger,IDataAccess dataAccess, IConfiguration configuration)
+    public HabitApplication(ILogger<HabitApplication> logger, IDataAccess dataAccess, IConfiguration configuration)
     {
         _logger = logger;
         _dataAccess = dataAccess;
         _connectionString = configuration.GetConnectionString("DefaultConnection");
-        
     }
+
+    public List<Habit> habbits { get; set; } = new();
 
     public void Run()
     {
@@ -29,18 +28,19 @@ public class HabitApplication
             Console.WriteLine("ERROR: Connection string is missing. Please check your configuration.");
             Environment.Exit(1); // Exit with error code
         }
+
         try
         {
-            _dataAccess.InitializeDb(connectionString: _connectionString);
-
+            _dataAccess.InitializeDb(_connectionString);
         }
-        catch( Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine("ERROR: Database connection failed. Please check your configuration.");
             Console.WriteLine($"Details: {ex.Message}");
             Environment.Exit(1);
         }
-        bool running = true;
+
+        var running = true;
         while (running)
         {
             ShowMainMenu();
@@ -55,36 +55,42 @@ public class HabitApplication
                 case "1":
                     InsertHabit();
                     break;
+                case "2":
+                    GetHabits();
+                    break;
+                case "5":
+                    GetHabit();
+                    break;
                 default:
                     Console.WriteLine("Invalid input. Please try again.");
                     break;
             }
         }
-
     }
-    
+
     public void ShowMainMenu()
     {
-        Console.WriteLine("Main Menu\n");
+        Console.WriteLine("\nMain Menu\n");
         Console.WriteLine("What would you like to do?\n");
         Console.WriteLine("Type '0' to close the application");
         Console.WriteLine("Type '1' to Insert habit");
         Console.WriteLine("Type '2' to View all habits");
         Console.WriteLine("Type '3' to delete habit");
         Console.WriteLine("Type '4' to update habit");
+        Console.WriteLine("Type '5' to View habit");
         Console.WriteLine("-----------------------------------\n");
         Console.Write("Enter your choice: ");
     }
 
     public void InsertHabit()
     {
-        string habitName = UserInput.GetUserInput("Enter habit's name: ");
-        string habitUnit = UserInput.GetUserInput("Enter habit's unit of measure: ");
-        int habitQuantity = UserInput.GetIntInput("Enter habit's quantity (no decimal numbers): ");
-        DateTime habitDate = UserInput.GetUserDate("Enter habit's date: ");
+        var habitName = UserInput.GetUserInput("Enter habit's name: ");
+        var habitUnit = UserInput.GetUserInput("Enter habit's unit of measure: ");
+        var habitQuantity = UserInput.GetIntInput("Enter habit's quantity (no decimal numbers): ");
+        var habitDate = UserInput.GetUserDate("Enter habit's date: ");
         try
         {
-            Habit habit = new Habit()
+            var habit = new Habit
             {
                 Name = habitName,
                 Unit = habitUnit,
@@ -99,5 +105,43 @@ public class HabitApplication
             Console.WriteLine($"Details: {ex.Message}");
         }
     }
-    
+
+    public void GetHabit()
+    {
+        int userInput = UserInput.GetIntInput("Please enter habit Id:");
+        try
+        {
+            Habit habit = _dataAccess.GetHabit(userInput, _connectionString);
+            if (habit == null)
+            {
+                Console.WriteLine("Habit not found!");
+                return;
+            }
+
+            Console.WriteLine($"Habit: {habit.Name}, Id: {habit.Id}, Unit: {habit.Unit}, " +
+                              $"Quantity: {habit.Quantity}, " +
+                              $"Date: {habit.Date}");
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: Could not get habit");
+        }
+        
+    }
+
+    public void GetHabits()
+    {
+        habbits = _dataAccess.GetHabits(_connectionString);
+        if (!habbits.Any())
+        {
+            Console.WriteLine("\nNo Habits found.");
+            return;
+        }
+
+        foreach (var habit in habbits)
+            Console.WriteLine($"Habit: {habit.Name}, Id: {habit.Id}, Date: {habit.Date:yyyy-MM-dd}");
+    }
 }
