@@ -93,7 +93,7 @@ public class HabitApplication
         var habitName = UserInput.GetUserInput("Enter habit's name: ");
         var habitUnit = UserInput.GetUserInput("Enter habit's unit of measure: ");
         var habitQuantity = UserInput.GetIntInput("Enter habit's quantity (no decimal numbers): ");
-        var habitDate = UserInput.GetUserDate("Enter habit's date: ");
+        var habitDate = UserInput.GetUserDate("Enter habit's date (yyyy/MM/dd): ");
         try
         {
             var habit = new Habit
